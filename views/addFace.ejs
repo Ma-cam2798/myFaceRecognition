@@ -1,8 +1,13 @@
 <%- include("partials/header"); -%>
 <h1>Add a face</h1>
+<%= typeof msg != 'undefined' ? msg : '' %>
 <form action="/addFace" method="POST">
   <label>Name</label>
-  <input type="text" name="nameFace" />
-  <button type="submit">Add</button>
+  <input name="nameFace" type="text" />
+  <br />
+  <br />
+  <br />
+  <button type="submit">create name and folder</button>
 </form>
+
 <%- include("partials/footer"); -%>

@@ -1,0 +1,11 @@
+<%- include("partials/header"); -%>
+<h1>upload a face</h1>
+
+<%= typeof msg != 'undefined' ? msg : '' %>
+
+<form action="/addFace/upload" method="POST" enctype="multipart/form-data">
+  <label>upload face</label>
+  <input name="myImage" type="file" />
+  <button type="submit">Submit</button>
+</form>
+<%- include("partials/footer"); -%>
