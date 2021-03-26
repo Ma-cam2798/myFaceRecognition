@@ -63,7 +63,6 @@ app.post("/addFace", function (req, res) {
     });
   } else {
     console.log("name exists");
-    res.redirect("/");
   }
 
   res.redirect("/addFace/upload");
@@ -106,7 +105,7 @@ app.post("/addFace/upload", function (req, res) {
   // Check File Type
   function checkFileType(file, cb) {
     // Allowed ext
-    const filetypes = /jpg/;
+    const filetypes = /jpeg|jpg|png|gif/;
     // Check ext
     const extname = filetypes.test(
       path.extname(file.originalname).toLowerCase()
