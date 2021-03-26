@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 import multer from "multer";
 import ejs from "ejs";
 import fs from "fs";
-import path from "path";
+import path, { dirname } from "path";
 
 const app = express();
 
@@ -25,54 +25,67 @@ app.get("/addFace", function (req, res) {
   res.render("addFace");
 });
 
-var dirName;
-
 app.post("/addFace", function (req, res) {
   //create directory
   const name = req.body.nameFace;
-  dirName = "./public/labeled_images/" + name + "/";
+  const dirName = "./public/labeled_images/" + name + "/";
 
   fs.mkdir(dirName, { recursive: true }, function (err) {
     if (err) {
       console.log(err);
     } else {
-      console.log("bitch is created");
+      console.log("Folder created");
     }
   });
 
   //push added label to database
-  labels.push(name);
+  var nameExists = 0;
 
-  const newLabel =
-    "const labels = " + JSON.stringify(labels) + "; export default labels;";
-
-  fs.writeFile("./public/labels.js", newLabel, function (err) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("bitch is appended");
+  for (let i = 0; i < labels.length; i++) {
+    if (labels[i] === name) {
+      nameExists++;
     }
-  });
+  }
+
+  if (nameExists === 0) {
+    labels.push(name);
+
+    const newLabel =
+      "const labels = " + JSON.stringify(labels) + "; export default labels;";
+
+    fs.writeFile("./public/labels.js", newLabel, function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Name appended");
+      }
+    });
+  } else {
+    console.log("name exists");
+  }
+
   res.redirect("/addFace/upload");
 });
 
 app.get("/addFace/upload", function (req, res) {
   res.render("upface");
-  console.log(dirName);
 });
 
 app.post("/addFace/upload", function (req, res) {
   //upload image
   // Set The Storage Engine
-  console.log(dirName);
+  const pathDir = "./public/labeled_images/" + labels[labels.length - 1] + "/";
 
   const storage = multer.diskStorage({
     destination(req, file, cb) {
-      cb(null, dirName);
+      cb(null, "./public/labeled_images/" + labels[labels.length - 1] + "/");
     },
     filename: function (req, file, cb) {
-      let fileName =
-        file.fieldname + "-" + Date.now() + path.extname(file.originalname);
+      let fileNumber = 1;
+      if (fs.existsSync(pathDir + "1" + path.extname(file.originalname))) {
+        fileNumber = 2;
+      }
+      let fileName = fileNumber + path.extname(file.originalname);
       cb(null, fileName);
     },
   });
@@ -83,12 +96,15 @@ app.post("/addFace/upload", function (req, res) {
     fileFilter: function (req, file, cb) {
       checkFileType(file, cb);
     },
-  }).single("myImage");
+  }).fields([
+    { name: "myImage1", maxCount: 1 },
+    { name: "myImage2", maxCount: 1 },
+  ]);
 
   // Check File Type
   function checkFileType(file, cb) {
     // Allowed ext
-    const filetypes = /jpeg|jpg|png|gif/;
+    const filetypes = /jpg/;
     // Check ext
     const extname = filetypes.test(
       path.extname(file.originalname).toLowerCase()
@@ -99,7 +115,7 @@ app.post("/addFace/upload", function (req, res) {
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb("Error: Images Only!");
+      cb("Error: jpg Only!");
     }
   }
   upload(req, res, (err) => {
@@ -108,19 +124,10 @@ app.post("/addFace/upload", function (req, res) {
         msg: err,
       });
     } else {
-      if (req.file == undefined) {
-        res.render("upFace", {
-          msg: "Error: No File Selected!",
-        });
-      } else {
-        res.render("upFace", {
-          msg: "File Uploaded!",
-          file: `uploads/${req.file.filename}`,
-        });
-      }
+      res.redirect("/");
+      console.log("Image uploaded");
     }
   });
-  console.log("bitch uploaded");
 });
 
 let port = 3000;

@@ -1,1 +1,1 @@
-const labels = ["Black Widow","Captain America","Captain Marvel","Hawkeye","Jim Rhodes","Thor","Tony Stark","Mina Myoui","asdsadsa","zxczxcqweqwe","asdqwezxc","asdqwezxcasdasd","dan","asdzxcqwe","asdzxcqwe","asdzxcqwe","asdzxcqwe","Dan","Dandabdavada","zxcasdqweasdzxc"]; export default labels;
+const labels = ["Black Widow","Captain America","Captain Marvel","Hawkeye","Jim Rhodes","Thor","Tony Stark","Mina Myoui"]; export default labels;
