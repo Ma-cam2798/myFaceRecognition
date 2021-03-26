@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import multer from "multer";
 import ejs from "ejs";
 import fs from "fs";
+import gm from "gm";
 import path, { dirname } from "path";
 
 const app = express();
@@ -62,6 +63,7 @@ app.post("/addFace", function (req, res) {
     });
   } else {
     console.log("name exists");
+    res.redirect("/");
   }
 
   res.redirect("/addFace/upload");
