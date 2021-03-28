@@ -1,5 +1,6 @@
 //jshint esversion:6
 
+//Labels is the database
 import labels from "./public/labels.js";
 
 import express from "express";
@@ -15,19 +16,24 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 
+//To be able to use the public folder we need to set it to static
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 
+//Renders the pages from views when requesting GET from the corresponding URL
 app.get("/", function (req, res) {
   res.render("home");
 });
-
 app.get("/addFace", function (req, res) {
   res.render("addFace");
 });
+app.get("/addFace/upload", function (req, res) {
+  res.render("upface");
+});
 
+//Does the following commands when reqesting from POST
 app.post("/addFace", function (req, res) {
-  //create directory
+  //Checks if directory exists and makes if not
   const name = req.body.nameFace;
   const dirName = "./public/labeled_images/" + name + "/";
 
@@ -39,7 +45,7 @@ app.post("/addFace", function (req, res) {
     }
   });
 
-  //push added label to database
+  //push added label to database if it does not exist yet
   var nameExists = 0;
 
   for (let i = 0; i < labels.length; i++) {
@@ -48,6 +54,7 @@ app.post("/addFace", function (req, res) {
     }
   }
 
+  //if name doesn't exists then writes then pushes the name and writes it to labels database
   if (nameExists === 0) {
     labels.push(name);
 
@@ -65,16 +72,13 @@ app.post("/addFace", function (req, res) {
     console.log("name exists");
   }
 
+  //after above code is executed redirects to said page
   res.redirect("/addFace/upload");
-});
-
-app.get("/addFace/upload", function (req, res) {
-  res.render("upface");
 });
 
 app.post("/addFace/upload", function (req, res) {
   //upload image
-  // Set The Storage Engine
+  //set The Storage Engine
   const pathDir = "./public/labeled_images/" + labels[labels.length - 1] + "/";
 
   const storage = multer.diskStorage({
@@ -91,7 +95,7 @@ app.post("/addFace/upload", function (req, res) {
     },
   });
 
-  // Init Upload
+  //init Upload
   const upload = multer({
     storage: storage,
     fileFilter: function (req, file, cb) {
@@ -102,15 +106,15 @@ app.post("/addFace/upload", function (req, res) {
     { name: "myImage2", maxCount: 1 },
   ]);
 
-  // Check File Type
+  //check File Type
   function checkFileType(file, cb) {
-    // Allowed ext
+    //allowed ext
     const filetypes = /jpeg|jpg|png|gif/;
-    // Check ext
+    //check ext
     const extname = filetypes.test(
       path.extname(file.originalname).toLowerCase()
     );
-    // Check mime
+    //check mime
     const mimetype = filetypes.test(file.mimetype);
 
     if (mimetype && extname) {
@@ -131,6 +135,7 @@ app.post("/addFace/upload", function (req, res) {
   });
 });
 
+//hosts the server
 let port = 3000;
 app.listen(port, () => {
   console.log(`Running at localhost:${port}`);
